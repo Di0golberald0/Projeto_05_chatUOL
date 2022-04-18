@@ -9,47 +9,68 @@ perguntarNome()
 function entrarSala(elemento) {
     const participante = axios.post('https://mock-api.driven.com.br/api/v6/uol/participants', elemento);
     console.log("entrarSala= " + elemento.name)
-    console.log("participante= " + participante)
     participante.then(entrarSucesso(elemento));
     participante.catch(entrarErro);
 }
 
 function entrarSucesso(usuario) {
-	console.log("Resposta recebida com sucesso!");
-    const statusCode = usuario.status;
-    console.log("statusCode= " + statusCode)
-    console.log("usuario= " + usuario.name)
-    //setInterval(manterConexao(usuario), 5000);
+	console.log("Entrou na sala com sucesso!");
+    setInterval(function () {
+        const repeticao = axios.post('https://mock-api.driven.com.br/api/v6/uol/status', usuario)
+        console.log("Repitiu com sucesso")
+}
+    , 5000);
     setInterval(displayMensagens, 3000);
 }
 
 function entrarErro(error) {
-    alert("Esse nome já está em uso, por favor escolha outro")
-	console.log("Resposta recebida com falha!");
-    const statusCode = error.response.status;
-    console.log(statusCode)
-    perguntarNome()
-}
-
-function manterConexao(elemento) {
-    const repeticao = axios.post('https://mock-api.driven.com.br/api/v6/uol/status', elemento);
-    console.log("manterConexao= "+ elemento.name)
-    console.log("Requisição enviada")
+    alert("Esse nome já está em uso, por favor escolha outro");
+    perguntarNome();
 }
 
 function displayMensagens() {
     console.log("displayMensagens")
     const messages = axios.get('https://mock-api.driven.com.br/api/v6/uol/messages');
+    console.log("messages=" + messages)
+    messages.then(displaySucesso);
+    messages.catch(displayErro);
+}
+
+function displaySucesso(elemento) {
+    console.log("Mensagens adquiridas")
+    const data = elemento.data;
     const mensagens = document.querySelector(".mensagens");
-    console.log(messages.data)
-    for(let i = 0; i < messages.lenght; i++){
+    mensagens.innerHTML = "";
+    for(let i = 0; i < data.length; i++){
         console.log("rodandoLoop")
-        mensagens.innerHTML += `
-        <div class="mensagem ${messages.type}">
-        <spam class="time">'(${messages.time}) '</spam> <spam class="from">'${messages.from} '</spam> para <spam class="to">'${messages.to}: '</spam><spam class="text">${messages.text}</spam>
-        </div>
-        `
+        if(data[i].type === "status"){
+            mensagens.innerHTML += `
+            <div class="mensagem ${data[i].type}">
+            <span class="time">(${data[i].time})</span><span class="from"> ${data[i].from}</span><span class="text"> ${data[i].text}</span>
+            </div>
+            `
+        }
+        else if(data[i].type === "message"){
+            mensagens.innerHTML += `
+            <div class="mensagem ${data[i].type}">
+            <span class="time">(${data[i].time}) </span> <span class="from">${data[i].from} para <span class="to">${data[i].to}</span>: </span><span class="text">${data[i].text}</span>
+            </div>
+            `
+        }
+        else{
+            mensagens.innerHTML += `
+            <div class="mensagem ${data[i].type}">
+            <span class="time">(${data[i].time}) </span> <span class="from">${data[i].from} reservadamente para <span class="to">${data[i].to}</span>: </span><span class="text">${data[i].text}</span>
+            </div>
+            `
+        }
     }
+    mensagens.scrollIntoView();
+}
+
+function displayErro() {
+    console.log("Deu xabu, mano")
+    displayMensagens()
 }
 
 function enviarMensagem() {
