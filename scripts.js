@@ -87,9 +87,14 @@ function enviarMensagem() {
         text: `${input.value}`,
         type: 'message'
     };
-    const envio = axios.post('https://mock-api.driven.com.br/api/v6/uol/messages', object);
-    envio.then(input.value = '', atualizarPagina)
-    envio.catch(function (error) {console.log(error.response)})
+    if(input.value !== ""){
+        const envio = axios.post('https://mock-api.driven.com.br/api/v6/uol/messages', object);
+        envio.then(function () {
+            input.value = '';
+            atualizarPagina()
+        })
+        envio.catch(function (error) {console.log(error.response)})
+    }
 }
 
 function atualizarPagina() {
