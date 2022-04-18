@@ -64,6 +64,10 @@
     background-color: #FFFFFF;
 }
 
+.time {
+    margin-left: 8px;
+}
+
 .bottom {
     position: fixed;
     left: 0px;
